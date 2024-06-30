@@ -1,7 +1,7 @@
 <template>
   <div
     class="fade-ease cursor-pointer flex-center"
-    :class="`${namespace} ${namespace}-${size}`"
+    :class="`${namespace} ${namespace}-${size} ${customClass}`"
     :style="{
       ...(highlight ? highlightStyle : null),
       '--hover-bg': hoverBg,
@@ -10,7 +10,7 @@
     @click="emits('click')">
     <div :class="size2ClassMap[size]">
       <slot v-if="$slots.default"></slot>
-      <i v-else class="icon iconfont font-inherit" :class="iconClass"></i>
+      <i v-else class="icon iconfont font-inherit inline-block" :class="iconClass"></i>
     </div>
   </div>
 </template>
@@ -23,11 +23,12 @@ interface IProps {
   /** icon类名 */
   iconClass?: string
   /** 三种尺寸：sm|md|lg */
-  size?: IconBtnSize
+  size?: "sm" | "md" | "lg"
   title?: string
   highlight?: boolean
   highlightStyle?: AnyObject
   hoverBg?: string
+  customClass?: string
 }
 withDefaults(defineProps<IProps>(), {
   size: IconBtnSize.MD,

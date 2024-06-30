@@ -5,13 +5,13 @@
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        message: "Welcome to vue Vue3 template!",
-      }
-    },
-  }
+export default {
+  data() {
+    return {
+      message: "This is a template of Vue3 Component!",
+    }
+  },
+}
 </script>
 
 <style scoped></style>

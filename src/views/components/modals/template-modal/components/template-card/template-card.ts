@@ -8,6 +8,10 @@ export const inbuiltTemplateIconMap = {
   [TemplateLang.VUE]: "icon-vue",
   [TemplateLang.VANILLA]: "icon-javascript",
   [TemplateLang.REACT]: "icon-jsx",
+  [TemplateLang.ELEMENT_PLUS]: "icon-element-plus",
+  [TemplateLang.ANT_DESIGN]: "icon-ant-design",
+  [TemplateLang.ECHARTS]: "icon-echarts",
+  [TemplateLang.RXJS]: "icon-rxjs",
 }
 
 export interface IProps {
@@ -15,9 +19,25 @@ export interface IProps {
   active: boolean
 }
 
-export interface IEmits {
-  (event: "choose" | "edit", value: ITemplateInfo): void
+enum EmitType {
+  CHOOSE = "choose",
+  EDIT = "edit",
+  DELETE = "delete",
 }
+
+export interface IEmits {
+  (event: "choose" | "edit" | "delete", value: ITemplateInfo): void
+}
+
+export enum TemplateOptionType {
+  EDIT,
+  DELETE,
+}
+
+export const templateOptions = [
+  { type: TemplateOptionType.EDIT, event: EmitType.EDIT, text: "编辑" },
+  { type: TemplateOptionType.DELETE, event: EmitType.DELETE, text: "删除" },
+]
 
 /** 根据模板的预处理获取模板的主要语言 */
 export const getTemplateIcon = (template: ITemplate): string => {

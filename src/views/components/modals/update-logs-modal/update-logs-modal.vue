@@ -20,7 +20,7 @@
           :key="version"
           @click="handleChooseVersion(version)">
           <span class="font-xs">{{ version }}</span>
-          <span v-if="!index" class="version-tag font-xxs ml-xs active-text">Latest</span>
+          <span v-if="!index" class="version-tag font-xxs ml-xs">Latest</span>
         </div>
       </div>
       <div v-if="currUpdateLog" class="log-detail flex-1 flex-col over-y-auto common-scrollbar">
@@ -115,13 +115,14 @@ const handleClickReloadUpdateLogs = () => {
 
 <style lang="scss" scoped>
 .update-logs-wrapper {
-  max-height: calc(100vh - 170px - 124px);
+  max-height: 500px;
   .version-list {
     width: 150px;
     max-height: 100%;
     .version-tag {
       padding: 1px 9px;
       border-radius: 9px;
+      color: var(--color-deep-bg-color);
       background-color: var(--color-primary1);
     }
   }

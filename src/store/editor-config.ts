@@ -2,7 +2,8 @@ import { defineStore } from "pinia"
 import { IEditorSettings, ShortcutMode, CodeFontFamily, IEditorLibraries, IEditorPrepMap, IEditorConfig } from "@type/settings"
 import { DeepPartial } from "@type/types"
 import { OriginLang, Prep } from "@type/prep"
-import { deepCopy } from "@utils/tools/common"
+import { deepCopy, isHttpUrl } from "@utils/tools/common"
+import { defaultFormatStyleOptions } from "@utils/editor/formatter/config"
 
 export const initialSettings: IEditorSettings = {
   edit: {
@@ -22,6 +23,9 @@ export const initialSettings: IEditorSettings = {
   font: {
     fontSize: 13,
     fontFamily: CodeFontFamily.JET_BRAINS_MONO,
+  },
+  formatting: {
+    config: defaultFormatStyleOptions,
   },
   other: {
     headTags: "",
@@ -55,7 +59,12 @@ export const useEditorConfigStore = defineStore("editorConfig", {
       this.$patch({ settings: deepCopy(settings) })
     },
     updateLibraries(libraries: Partial<IEditorLibraries>): void {
-      this.$patch({ libraries: deepCopy(libraries) })
+      if (libraries.script) {
+        this.libraries.script = libraries.script.filter((url) => isHttpUrl(url))
+      }
+      if (libraries.style) {
+        this.libraries.style = libraries.style.filter((url) => isHttpUrl(url))
+      }
     },
     updatePrepMap(prepMap: Partial<IEditorPrepMap>): void {
       this.$patch({ prepMap: { ...prepMap } })

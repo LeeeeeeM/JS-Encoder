@@ -41,7 +41,7 @@
               <span v-if="currentMatch">{{ currentMatch }} of {{ matchesCount }}</span>
               <span v-else>{{ matchesCount }} results</span>
             </template>
-            <span v-else :class="searchValue ? 'error-text' : ''">No results</span>
+            <span v-else :class="searchValue ? 'red1-text' : ''">No results</span>
           </div> -->
           <div
             class="cursor-pointer search-option"
@@ -281,10 +281,10 @@ defineExpose({
       align-items: center;
       flex-shrink: 0;
       &:hover {
-        background-color: var(--color-main-bg-4);
+        background-color: var(--color-main-bg-0);
       }
       &.active {
-        background-color: var(--color-main-bg-4);
+        background-color: var(--color-main-bg-0);
       }
       &.disabled {
         opacity: 0.5;

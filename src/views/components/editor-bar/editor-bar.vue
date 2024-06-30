@@ -1,12 +1,12 @@
 <template>
-  <div class="editor-bar bg-main2 flex no-select" ref="editorBarRef">
+  <div class="editor-bar bg-main2 flex no-select over-x-auto" ref="editorBarRef">
     <!-- tab位置切换动画 -->
     <template v-for="(tabId, index) in editor.tabIds" :key="tabId">
       <!-- tab间的分隔线 -->
       <div class="split-line fill-h bg-main3" v-if="!!index"></div>
       <!-- tab本身 -->
       <div
-        class="editor-tab flex-y-center fill-h text-hover-active cursor-pointer transition-all flex-y-center"
+        class="editor-tab flex-y-center fill-h text-hover-active cursor-pointer flex-y-center"
         :class="{
           'active': tabId === editor.displayTabId,
           'dragging': tabId === draggingTabInfo?.tabId,
@@ -21,14 +21,20 @@
         <span class="editor-tab-title code-font">{{ tabId2PrepMap[tabId] }}</span>
       </div>
     </template>
+    <!-- 占位 -->
     <div
-      class="flex flex-1 bg-main2 right-side pr-s"
+      class="flex-1 bg-main2"
+      :class="isOverlapRightSide ? 'highlight' : ''"
+      @dragover.prevent="handleTabDragOverRightSide()"
+      @dragleave.prevent="handleTabDragLeaveRightSide()"
+      @drop.prevent="handleTabDrop()"
+    ></div>
+    <div
+      class="flex flex-sh bg-main2 right-side pr-s sticky"
       :class="isOverlapRightSide ? 'highlight' : ''"
       @dragover.prevent="handleTabDragOverRightSide()"
       @dragleave.prevent="handleTabDragLeaveRightSide()"
       @drop.prevent="handleTabDrop()">
-      <!-- 占位 -->
-      <div class="flex-1"></div>
       <!-- 直接展示出的选项 -->
       <div class="display-opts flex-y-center" v-if="sideOptions.display.length">
         <template v-for="(item, index) in sideOptions.display" :key="index">
@@ -42,7 +48,7 @@
       </div>
       <!-- 更多选项菜单 -->
       <div class="more-opts" v-show="sideOptions.more.length">
-        <dropdown v-model="showSideMenu" :align="Align.RIGHT">
+        <dropdown v-model="showSideMenu" :align="Align.RIGHT" append-to-body>
           <div class="more-icon-wrapper flex-center">
             <icon-btn :size="IconBtnSize.MD" title="更多" icon-class="icon-more"></icon-btn>
           </div>
@@ -61,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from "vue"
+import { onMounted, ref, shallowRef } from "vue"
 import { storeToRefs } from "pinia"
 import { useEditorWrapperStore } from "@store/editor-wrapper"
 import { Align } from "@type/interface"
@@ -74,12 +80,18 @@ import IconBtn from "@components/icon-btn/icon-btn.vue"
 import UtilService from "@utils/services/util-service"
 import { toggleMarkdownToolsPanel } from "@utils/editor/panels/markdown-tools"
 import EditorKeeperService from "@utils/services/editor-keeper-service"
-import { formatCode } from "@utils/editor/formatter"
+import useWheelDirective from "@hooks/use-wheel-directive"
+import useCodeFormatting from "@hooks/use-code-formatting"
 
 const props = defineProps<{
   editorId: number
   splitterId: number
 }>()
+
+const editorBarRef = shallowRef<HTMLElement | null>(null)
+onMounted(() => {
+  useWheelDirective(editorBarRef.value!)
+})
 
 const editorWrapperStore = useEditorWrapperStore()
 const { updateEditor, updateDraggingTabInfo, deleteSplitter, updateSplitter, updateCodeMap } = editorWrapperStore
@@ -125,7 +137,6 @@ const handleTabDragLeaveRightSide = (): void => {
   isOverlapRightSide.value = false
 }
 /** 处理拖拽移出(dragleave)事件 */
-const editorBarRef = shallowRef<HTMLElement | null>(null)
 const resetHookState = useDragleaveJudge(editorBarRef, () => {
   resetDragState()
 })
@@ -236,11 +247,11 @@ const resetDragState = () => {
 /** 右侧工具栏菜单 */
 const { showSideMenu, sideOptions } = useEditorSideOptions(editor.id)
 const editorKeeperService = new EditorKeeperService()
-
+const { formatEditorCode } = useCodeFormatting()
 const sideOptionType2FuncMap = {
   [EditorSideOptionType.FORMAT_CODE]: async () => {
     const { id } = tabMap.value[editor.displayTabId]
-    const formattedCode = await formatCode(codeMap.value[id], tabId2PrepMap.value[id])
+    const formattedCode = await formatEditorCode(codeMap.value[id], tabId2PrepMap.value[id])
     updateCodeMap({ [id]: formattedCode })
     editorKeeperService.getEditorExposed(id).restoreViewScroll()
   },

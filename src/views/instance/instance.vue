@@ -7,7 +7,7 @@
       <editor-wrapper></editor-wrapper>
     </div>
     <!--结果-->
-    <div class="flex" :style="{ width: `${isShowResult ? modulesSize.resultWidth : 0}px` }">
+    <div class="flex" :style="{ width: `${resultWidth}px` }">
       <div class="resize-line fill-h">
         <!--分割线-->
         <split-line
@@ -17,7 +17,7 @@
           @mousedown.prevent="handleResizeEditorAndResult"
         ></split-line>
       </div>
-      <div class="flex-1">
+      <div :style="{ width: `calc(${resultWidth - resizeLineWidth}px)` }">
         <result></result>
       </div>
     </div>
@@ -41,16 +41,21 @@ import UpdateLogsModal from "@views/components/modals/update-logs-modal/update-l
 import SplitLine from "@components/split-line/split-line.vue"
 import Result from "@views/components/result/result.vue"
 import { SplitDirection } from "@type/editor"
-import { onMounted, watch, onUnmounted } from "vue"
+import { computed, onMounted, watch } from "vue"
 import { getModulesHeight, getModulesWidth } from "./instance"
 import { useLayoutStore } from "@store/layout"
 import useWindowResize from "@hooks/use-window-resize"
+import useBeforeUnload from "@hooks/use-before-unload"
 import ModuleSizeService, { EDITOR_MIN_WIDTH, RESULT_MIN_WIDTH } from "@utils/services/module-size-service"
 import { storeToRefs } from "pinia"
 import { useCommonStore } from "@store/common"
 import { ModalName } from "@type/interface"
 import { listenMousemove } from "@utils/tools/event"
 import { onBeforeRouteLeave } from "vue-router"
+import useInstanceInit from "./hooks/use-instance-init"
+
+const { initInstance } = useInstanceInit()
+initInstance()
 
 const layoutStore = useLayoutStore()
 const {
@@ -64,6 +69,7 @@ const { clientWidth, clientHeight } = useWindowResize()
 
 const commonStore = useCommonStore()
 const { displayModal } = storeToRefs(commonStore)
+
 const displayModalMap = {
   [ModalName.TEMPLATE]: TemplateModal,
   [ModalName.PREPROCESSOR]: PreprocessorModal,
@@ -119,20 +125,22 @@ const handleResizeEditorAndResult = (e: MouseEvent): void => {
   })
 }
 
-// 生产环境刷新页面时提示
-const beforeunload = (event: BeforeUnloadEvent) => {
-  event.preventDefault()
-}
+const resizeLineWidth = 1
+const resultWidth = computed(() => isShowResult.value ? modulesSize.resultWidth - resizeLineWidth : 0)
+
+/**
+ * 离开时提示更改可能未保存
+ */
 if (import.meta.env.PROD) {
-  window.addEventListener("beforeunload", beforeunload)
+  useBeforeUnload()
 }
-onUnmounted(() => {
-  window.removeEventListener("beforeunload", beforeunload)
-})
 onBeforeRouteLeave(() => {
   if (import.meta.env.PROD) {
-    window.confirm("你所做的更改可能未保存。")
+    if (!window.confirm("你所做的更改可能未保存。")) {
+      return false
+    }
   }
+  return true
 })
 </script>
 

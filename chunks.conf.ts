@@ -10,18 +10,23 @@ const codemirrorChunk = [
   "@codemirror/view", "@codemirror/lang-css", "@codemirror/lang-html", "@codemirror/lang-javascript",
   "@codemirror/lang-less", "@codemirror/lang-markdown", "@codemirror/lang-sass", "@codemirror/lang-vue",
   "@emmetio/codemirror6-plugin", "@replit/codemirror-indentation-markers", "@replit/codemirror-vscode-keymap",
+  "@codemirror/lang-json",
 ]
 
 /** 代码编译相关分包 */
 const compileChunk = [
-  "@vue/compiler-sfc", "espree", "estraverse", "marked", "marked-highlight",
+  "@vue/compiler-sfc", "espree", "estraverse", "marked", "marked-highlight", "hash-sum",
+]
+
+/** lint相关分包 */
+const lintChunk = [
+  "eslint4b-prebuilt", "stylelint", "stylelint-config-recommended-less", "stylelint-config-standard",
+  "stylelint-config-standard-scss", "stylelint-config-standard-vue", "htmlhint",
 ]
 
 /** 其他插件相关分包 */
 const pluginChunk = [
-  "eslint4b-prebuilt", "@typescript/vfs", "hash-sum", "htmlhint", "stylelint",
-  "stylelint-config-recommended-less", "stylelint-config-standard", "stylelint-config-standard-scss",
-  "jszip", "stylelint-config-standard-vue",
+  "@typescript/vfs", "jszip", "fflate", "strip-json-comments",
 ]
 
 const prettierChunk = [
@@ -32,6 +37,7 @@ export default {
   mainChunk,
   codemirrorChunk,
   compileChunk,
+  lintChunk,
   pluginChunk,
   prettierChunk,
 }
